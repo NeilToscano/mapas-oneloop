@@ -1,24 +1,28 @@
-import { defineComponent, ref } from 'vue'
-import { useMapsStore } from '@/composables';
+import { useRoom } from '@/composables'
+import { defineComponent, ref, watch } from 'vue'
 
 export default defineComponent({
   name: 'CardAbsolute',
 
   setup() {
-    const { roomSelected, cardMap, toggleCardMap } = useMapsStore();
-    const modalRef = ref(null);
+    const modalRef = ref(null)
+
+    const { roomSelected, cardMap, toggleCardMap, roomsList } = useRoom()
+
+    watch(cardMap, () => {
+      console.log(cardMap.value, 'no se modifica')
+    })
     window.onclick = function (event) {
-      console.log("hello");
       if (event.target == modalRef.value) {
         toggleCardMap()
       }
     }
 
     return {
-        roomSelected,
-        modalRef,
-        cardMap,
-
+      roomSelected,
+      roomsList,
+      modalRef,
+      cardMap
     }
   }
 })

@@ -7,6 +7,8 @@ export const usePlaceStore = defineStore('place', () => {
   const isLoading = ref(true)
   const userLocation = ref<[number, number] | null>(null)
   const roomLocation = ref<[number, number] | null>(null)
+  const primeraVezEntra = ref<number>(0);
+  const passTimeLogo = ref(false);
 
   const places = ref<Feature[]>([])
   const isLoadingPlaces = ref<boolean>(false)
@@ -17,12 +19,19 @@ export const usePlaceStore = defineStore('place', () => {
     places.value = []
   }
 
+  function setInitLocationRoom() {
+    if (!userLocation.value) {
+      return
+    }
+    if (roomLocation.value === null) {
+      roomLocation.value = [...userLocation.value]
+    }
+  }
   function getIntialLocation() {
-    // todo: colocar Loading
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        console.log(position.coords)
         userLocation.value = [position.coords.longitude, position.coords.latitude]
+        // roomLocation.value = [position.coords.longitude, position.coords.latitude]
         isLoading.value = false
       },
       (err) => {
@@ -31,9 +40,19 @@ export const usePlaceStore = defineStore('place', () => {
       }
     )
   }
+
   function setIsLoadingPlaces() {
     isLoadingPlaces.value = true
   }
+
+  function setPrimeraVezEntra() {
+    primeraVezEntra.value = 1;
+  }
+
+  function setPassTimeLogo (valor: boolean) {
+    passTimeLogo.value = valor;
+  }
+
   function setPlaces(placesMap: Feature[]) {
     places.value = placesMap
     isLoadingPlaces.value = false
@@ -54,7 +73,7 @@ export const usePlaceStore = defineStore('place', () => {
         proximity: userLocation.value.join(',')
       }
     })
-    console.log(res);
+    console.log(res)
     setPlaces(res.data.features)
     return res.data.features
   }
@@ -73,6 +92,11 @@ export const usePlaceStore = defineStore('place', () => {
     isLoadingPlaces,
     setRoomLocation,
     roomLocation,
-    cleanPlaces
+    cleanPlaces,
+    setInitLocationRoom,
+    setPrimeraVezEntra,
+    primeraVezEntra,
+    passTimeLogo,
+    setPassTimeLogo
   }
 })

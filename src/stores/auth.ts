@@ -16,6 +16,7 @@ export const useLoginStore = defineStore('login', () => {
 
   const userInfo = computed(() => initialState.value.user)
   const getErrorLogin = computed(() => initialState.value.errorMessage)
+  const stateUser = computed(() => initialState.value.status)
 
   function onChecking() {
     initialState.value.status = 'checking'
@@ -44,17 +45,14 @@ export const useLoginStore = defineStore('login', () => {
 
   async function initializeAuth() {
     const token = localStorage.getItem('idToken')
-    console.log(token, 'recuperado')
-    console.log('hola')
+
     if (!token) {
       onLogout(undefined)
       return { ok: false }
     }
     try {
       const { data } = await cuartosApi.post('/lookup', null, { params: { access_token: token } })
-      console.log(data, 'data')
       const { nombre, email, uid } = data.usuario
-      console.log('estamos chequeando')
       onLogin({ name: nombre, uid: uid, email: email })
       return { ok: true }
     } catch (error) {
@@ -72,6 +70,7 @@ export const useLoginStore = defineStore('login', () => {
     initialState,
     getErrorLogin,
     initializeAuth,
-    userInfo
+    userInfo,
+    stateUser
   }
 })

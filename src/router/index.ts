@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { useLoginStore } from '@/stores/auth'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -11,17 +11,14 @@ const router = createRouter({
         {
           path: '',
           name: 'home',
-          component: () => import('../views/HomeView.vue')
+          component: () => import('@/views/HomeView.vue')
+        },
+        {
+          path: 'about',
+          name: 'about',
+          component: () => import('@/views/AboutView.vue')
         }
       ]
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
     },
     {
       path: '/login',
@@ -35,12 +32,12 @@ const router = createRouter({
           next()
         }
       },
-      component: () => import('../views/LoginView.vue')
+      component: () => import('@/views/LoginView.vue')
     },
     {
       path: '/registrarse',
       name: 'registrarse',
-      component: () => import('../views/LoginView.vue')
+      component: () => import('@/views/RegisterView.vue')
     },
     {
       path: '/places',
@@ -59,9 +56,18 @@ const router = createRouter({
         {
           path: '',
           name: 'infoplace',
-          component: () => import('../views/place/PlaceView.vue')
+          component: () => import('@/views/place/PlaceView.vue')
+        },
+        {
+          path: 'publicaciones',
+          name: 'publicaciones',
+          component: () => import('@/views/place/PublicacionesView.vue')
         }
       ]
+    },
+    {
+      path: '/:catchAll(.*)*',
+      redirect: { name: 'home' }
     }
   ]
 })

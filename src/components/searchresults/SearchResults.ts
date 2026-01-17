@@ -1,4 +1,4 @@
-import { useMapsStore, usePlacesStore } from '@/composables'
+import { useRoom, useMapsStore, usePlacesStore } from '@/composables'
 import { useBedroomsStore } from '@/composables/useBedroomsStore'
 import type { Feature } from '@/interfaces/places'
 
@@ -12,13 +12,15 @@ export default defineComponent({
     const activePlace = ref('')
     const { map, setPlaceMarkers } = useMapsStore()
     const { calcularDistancia } = useBedroomsStore()
+    const { setRoomMarkers } = useRoom()
 
     watch(places, (newValue, oldValue) => {
-      console.log(places.value,'places');
-      activePlace.value = '';
-      if(places.value.length>0){
-        console.log(places.value);
-        setPlaceMarkers(places.value);
+      activePlace.value = ''
+      if (places.value.length > 0) {
+        console.log(places.value)
+        setPlaceMarkers(places.value)
+        if (!map.value) return
+        setRoomMarkers(map.value)
       }
     })
     const puntosUbi = [
@@ -34,8 +36,8 @@ export default defineComponent({
         map.value?.flyTo({
           center: [lng, lat],
           zoom: 14
-        });
-        cleanPlaces();
+        })
+        cleanPlaces()
         const distancia = calcularDistancia(puntosUbi[1], puntosUbi[0], puntosUbi[3], puntosUbi[2])
         console.log(distancia)
       }

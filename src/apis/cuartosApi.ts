@@ -1,6 +1,6 @@
 import axios from 'axios'
 const cuartosApi = axios.create({
-  baseURL: 'http://localhost:8081/api'
+  baseURL: 'https://cuartosoneloop.azurewebsites.net/api'
 })
 
 export default cuartosApi

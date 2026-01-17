@@ -10,111 +10,172 @@
 
         <span
           class="badge text-bg-success"
-          style="display: inline-block; word-wrap: break-word; white-space: normal"
+          style="
+            display: inline-block;
+            word-wrap: break-word;
+            white-space: normal;
+            margin-left: 2px;
+          "
         >
-          ubicación: {{ roomLocation }}
+          lng y lat: {{ roomLocation }}
         </span>
-        <form @submit.prevent="handleSubmit">
+        <br />
+        <span v-if="roomLocation === null ? true : false" style="color: rgb(241, 103, 103)">
+          Escoja la ubicación</span
+        >
+        <form @submit.prevent="handleSubmit" class="needs-validation" ref="formValidation" validate>
           <div class="form-group p-2">
-            <label for="exampleInputEmail1">Distrito</label>
+            <label for="distritoInput">Distrito</label>
             <input
               type="text"
               class="form-control"
-              id="exampleInputEmail1"
-              aria-describedby="emailHelp"
+              id="distritoInput"
               placeholder="Rimac, Lima"
               v-model="distrito"
+              required
+              style="font-weight: 500; color: black"
             />
+            <div class="invalid-feedback">Introduzca el Distrito</div>
           </div>
 
           <div class="form-group p-2">
-            <label for="exampleInputPassword1">Avenida,jr...</label>
+            <label for="avenidaInput">Avenida,jr, número</label>
             <input
               type="text"
               class="form-control"
-              id="exampleInputPassword1"
-              placeholder="Av. Honorio Delgado 1536"
+              id="avenidaInput"
+              placeholder="Av. Honorio Delgado N° 1536"
               v-model="avenida"
+              required
+              style="font-weight: 500; color: black"
             />
+            <div class="invalid-feedback">Introduzca la avenida</div>
           </div>
 
           <div class="form-group p-2">
-            <label for="exampleInputPassword1">Precio.</label>
+            <label for="precioInput">Precio.</label>
             <input
               type="number"
               class="form-control"
-              id="precio"
+              id="precioInput"
               placeholder="280"
               v-model="precio"
+              required
+              style="font-weight: 500; color: black"
             />
+            <div class="invalid-feedback">Introduzca el Precio</div>
           </div>
 
           <div class="form-group p-2">
             <div class="row">
               <div class="col">
-                <label for="exampleInputPassword1">Tamaño</label>
+                <label for="tamInput">Tamaño</label>
                 <input
                   type="number"
                   class="form-control"
-                  id="exampleInputPassword1"
+                  id="tamInput"
                   placeholder="15"
                   v-model="tamroom"
+                  required
+                  style="font-weight: 500; color: black"
                 />
+                <div class="invalid-feedback">Introduzca tamaño de la habitación</div>
               </div>
               <div class="col">
-                <label for="exampleInputPassword1">Baño</label>
+                <label for="banInput">Baño</label>
                 <input
                   type="number"
                   class="form-control"
-                  id="exampleInputPassword1"
+                  id="banInput"
                   placeholder="1"
                   v-model="numbanio"
+                  required
+                  style="font-weight: 500; color: black"
                 />
+                <div class="invalid-feedback">introduzca n° de baños</div>
               </div>
               <div class="col">
-                <label for="exampleInputPassword1">Dormitorios</label>
+                <label for="numdormInput">Dormitorios</label>
                 <input
                   type="number"
                   class="form-control"
-                  id="exampleInputPassword1"
+                  id="numdormInput"
                   placeholder="1"
                   v-model="numdormitorio"
+                  required
+                  style="font-weight: 500; color: black"
                 />
+                <div class="invalid-feedback">Introduzca n° de dormintorio</div>
               </div>
             </div>
           </div>
 
           <div class="form-group p-2">
-            <label for="exampleInputPassword1">Teléfono</label>
+            <label for="numtelInput">Teléfono</label>
             <input
               type="text"
               class="form-control"
-              id="exampleInputPassword1"
-              placeholder="946684130"
+              id="numtelInput"
+              placeholder="941234112"
               v-model="numtelefono"
+              required
+              style="font-weight: 500; color: black"
             />
+            <div class="invalid-feedback">Introduzca n° de teléfono</div>
           </div>
 
           <div class="form-group p-2">
-            <label for="exampleInputPassword1">Descripción</label>
+            <label for="descInput">Descripción/Referencia</label>
             <textarea
               class="form-control"
               name="example"
-              id=""
+              id="descInput"
               cols="30"
               rows="3"
               placeholder="Estamos ubicado al lado de un parque, además contamos con internet"
               v-model="descripcion"
+              required
+              style="font-weight: 500; color: black"
             ></textarea>
+            <div class="invalid-feedback">Introduzca descripción</div>
           </div>
 
           <div class="form-group p-2">
             <label for="myfile">Selecciona las fotos:</label>
-            <input type="file" id="myfile" name="myfile" multiple="true" ref="fileOneLoop" />
+            <input
+              type="file"
+              id="myfile"
+              name="myfile"
+              multiple="true"
+              ref="fileOneLoop"
+              required
+              style="font-weight: 500; color: black"
+            />
+            <div class="invalid-feedback">suba por lo menos una imagen</div>
           </div>
           <div id="thumbnails"></div>
+
           <div class="form-group p-2">
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="btn btn-success" ref="formSubmit">
+              <div v-if="enviado === 'checking'" class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Enviando...</span>
+              </div>
+              <div v-else>Submit</div>
+            </button>
+            <span
+              class="badge bg-danger m-1"
+              v-if="enviado === 'no-enviado' ? true : false"
+              style="color: white; font-size: small"
+            >
+              Error al enviar
+            </span>
+            <span
+              class="badge bg-info m-1"
+              v-else-if="enviado === 'enviado' ? true : false"
+              style="color: white; font-size: small; font-size: 1rem"
+            >
+              Enviado correctamente!
+            </span>
           </div>
         </form>
       </div>
@@ -124,6 +185,7 @@
 
 <script lang="ts">
 import { usePlacesStore } from '@/composables'
+import { useLogin } from '@/composables/useAuth'
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -132,6 +194,12 @@ export default defineComponent({
     const fileOneLoop = ref<HTMLInputElement | null>(null)
     const router = useRouter()
     const { roomLocation, sendFormInfo } = usePlacesStore()
+    const { userInfo } = useLogin()
+
+    const enviado = ref('inicio')
+
+    const formValidation = ref<HTMLFormElement | null>(null)
+    const formSubmit = ref()
 
     const tamroom = ref(null)
     const numbanio = ref(null)
@@ -143,6 +211,18 @@ export default defineComponent({
     const numdormitorio = ref(null)
 
     onMounted(() => {
+      formSubmit.value.addEventListener(
+        'click',
+        (event: any) => {
+          if (!formValidation.value) return
+          if (!formValidation.value.checkValidity()) {
+            formValidation.value.classList.add('was-validated')
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        },
+        false
+      )
       const fileInput = fileOneLoop.value
       if (fileInput) {
         fileInput.addEventListener('change', handleFiles)
@@ -152,6 +232,8 @@ export default defineComponent({
     //   const numFiles = files.length;
     const handleFiles = () => {
       const thumbnailsContainer = document.getElementById('thumbnails')
+      if (!thumbnailsContainer) return
+      thumbnailsContainer.innerHTML = ''
       const formdata = new FormData()
       if (fileOneLoop.value?.files) {
         for (let i = 0; i < fileOneLoop.value.files.length; i++) {
@@ -168,8 +250,7 @@ export default defineComponent({
               thumbnail.src = event.target?.result
               thumbnail.style.width = '100px'
               thumbnail.style.height = 'auto'
-
-              thumbnailsContainer?.appendChild(thumbnail)
+              ;(thumbnail.style.margin = '2px'), thumbnailsContainer?.appendChild(thumbnail)
             }
           }
           reader.readAsDataURL(file)
@@ -182,7 +263,11 @@ export default defineComponent({
 
       return
     }
+
     return {
+      enviado,
+      formValidation,
+      formSubmit,
       fileOneLoop,
       handleFiles,
 
@@ -200,21 +285,22 @@ export default defineComponent({
         router.push({ name: routeVal })
       },
 
-      handleSubmit: (event: Event) => {
+      handleSubmit: async (event: Event) => {
+        console.log('hell9')
         event.preventDefault()
+
         const formdata = handleFiles()
         if (
-          !numdormitorio.value ||
-          !descripcion.value ||
-          !numtelefono.value ||
-          !numbanio.value ||
-          !avenida.value ||
-          !distrito.value ||
-          !precio.value ||
-          !roomLocation.value ||
-          !tamroom.value
+          numdormitorio.value === null ||
+          descripcion.value === null ||
+          numtelefono.value === null ||
+          numbanio.value === null ||
+          avenida.value === null ||
+          distrito.value === null ||
+          precio.value === null ||
+          roomLocation.value === null ||
+          tamroom.value === null
         ) {
-          console.log('debe completar los campos')
           return
         }
         formdata?.append('email', 'neil@gmail.com')
@@ -227,11 +313,34 @@ export default defineComponent({
         formdata?.append('descripcion', descripcion.value)
         formdata?.append('numtelefono', numtelefono.value)
         formdata?.append('numdormitorio', numdormitorio.value)
+        formdata?.append('usuario', userInfo.value.uid)
 
         if (!formdata) {
           return
         }
-        sendFormInfo(formdata)
+        enviado.value = 'checking'
+        const { ok, msg } = await sendFormInfo(formdata)
+        if (ok) {
+          enviado.value = 'enviado'
+        } else {
+          enviado.value = 'no-enviado'
+        }
+        setTimeout(() => {
+          enviado.value = 'inicio'
+        }, 6000)
+
+        formValidation.value?.reset()
+        tamroom.value = null
+        numbanio.value = null
+        distrito.value = null
+        avenida.value = null
+        precio.value = null
+        descripcion.value = ''
+        numtelefono.value = null
+        numdormitorio.value = null
+        const thumbnailsContainer = document.getElementById('thumbnails')
+        if (!thumbnailsContainer) return
+        thumbnailsContainer.innerHTML = ''
       }
     }
   }
@@ -241,5 +350,8 @@ export default defineComponent({
 <style scoped>
 div label {
   font-weight: bold;
+}
+::placeholder {
+  opacity: 0.4; /* Ajusta el valor según sea necesario (entre 0 y 1) */
 }
 </style>

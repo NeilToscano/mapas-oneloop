@@ -11,12 +11,26 @@
           font-size: 2rem;
           text-align: center;
           background-color: rgb(23, 93, 96);
+          color: white;
         "
       >
-        Login
+        Registrarse
       </div>
       <div class="card-body">
         <form @submit.prevent="handleSubmit">
+          <div class="form-group p-2">
+            <label for="nombre">Nombre completo</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nombre"
+              placeholder="Nombre"
+              v-model="nombre"
+            />
+            <span style="color: red; font-size: small" v-if="!isNombreValid">
+              Nombre completo es obligatorio
+            </span>
+          </div>
           <div class="form-group p-2">
             <label for="exampleInputEmail1">Correo electrónico</label>
             <input
@@ -46,43 +60,22 @@
           <div class="form-group p-2">
             <div class="row">
               <div class="col">
-                <button
-                  type="submit"
-                  class="btn"
-                  style="background-color: rgb(23, 93, 96); color: white"
-                >
-                  <div
-                    v-if="isAuth === 'checking'"
-                    class="spinner-border text-primary"
-                    role="status"
-                  >
+                <button type="submit" class="btn" style="background-color: rgb(23,93,96); color: white;">
+                  <div v-if="checkingRegister" class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                   </div>
                   <div v-else>Submit</div>
                 </button>
               </div>
-              <div class="col">
-                <button
-                  :disabled="checkingGoogle"
-                  type="button"
-                  class="btn"
-                  style="background-color: rgb(23, 93, 96); color: white"
-                  @click="googleSingIn"
-                >
-                  <i class="bi bi-google me-2 center" style="color: orange"></i>Google
-                </button>
-              </div>
-              <span
-                v-if="getErrorLogin !== undefined ? true : false"
-                style="color: red; font-size: small"
-              >
-                credenciales incorrectas
+
+              <span v-if="registerError" style="color: red; font-size: small">
+                Ocurrió un error(intenta con otro correo)
               </span>
               <br />
             </div>
             <div class="row text-end">
               <div class="col align-self-end">
-                <router-link to="/registrarse">Crear cuenta</router-link>
+                <router-link to="/login">Ya tengo cuenta</router-link>
               </div>
             </div>
           </div>
@@ -95,19 +88,22 @@
 <script lang="ts">
 import { useLogin } from '@/composables/useAuth'
 import { defineComponent, ref } from 'vue'
-import { singInWithGoogle } from '@/firebase/providers'
 import { useRouter } from 'vue-router'
 export default defineComponent({
   setup() {
+    const { startRegister } = useLogin()
     const router = useRouter()
+
     const email = ref('')
     const password = ref('')
-    const checkingGoogle = ref(false)
-
-    const { startLogin, isAuth, getErrorLogin, startLoginGoogle } = useLogin()
+    const nombre = ref('')
 
     let isEmailValid = ref(true)
     let isPasswordValid = ref(true)
+    let isNombreValid = ref(true)
+
+    const checkingRegister = ref(false)
+    const registerError = ref(false)
 
     const validarEmail = (email: string) => {
       const expresionRegular = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -118,38 +114,26 @@ export default defineComponent({
       return passwordVal.length >= 8 ? true : false
     }
 
-    const googleSingIn = async () => {
-      checkingGoogle.value = true
-      try {
-        const { ok, displayName, email } = await singInWithGoogle()
-        if (!ok) {
-          checkingGoogle.value = false
-          return
-        }
-
-        if (!email || !displayName) return
-
-        const result = await startLoginGoogle({ email, displayName })
-        checkingGoogle.value = false
-        if (result.ok) return router.push({ name: 'infoplace' })
-      } catch (error) {
-        checkingGoogle.value = false
-        console.log(error)
-      }
+    const validarNombre = (nombreVal: string) => {
+      return nombreVal.length >= 3 ? true : false
     }
+
     return {
-      googleSingIn,
-      checkingGoogle,
-      isAuth,
       email,
       password,
+      nombre,
       isEmailValid,
       isPasswordValid,
-      getErrorLogin,
+      isNombreValid,
+      checkingRegister,
+      registerError,
 
       handleSubmit: async (event: Event) => {
+        checkingRegister.value = true
         isEmailValid.value = validarEmail(email.value)
         isPasswordValid.value = validarPassword(password.value)
+        isNombreValid.value = validarNombre(nombre.value)
+
         if (!isEmailValid.value) {
           setTimeout(() => {
             isEmailValid.value = true
@@ -160,12 +144,28 @@ export default defineComponent({
             isPasswordValid.value = true
           }, 3000)
         }
-        if (isEmailValid.value && isPasswordValid) {
+        if (!isNombreValid.value) {
+          setTimeout(() => {
+            isNombreValid.value = true
+          }, 3000)
+        }
+        if (isEmailValid.value && isPasswordValid.value && isNombreValid.value) {
           const user_email = email.value
           const user_password = password.value
-          const { ok } = await startLogin({ user_email, user_password })
-          if (ok) return router.push({ name: 'infoplace' })
+          const user_name = nombre.value
+
+          const { ok } = await startRegister({ user_email, user_password, user_name })
+          checkingRegister.value = false
+          if (ok) return router.push({ name: 'login' })
+          else {
+            registerError.value = true
+            setTimeout(() => {
+              registerError.value = false
+            }, 3000)
+          }
         } else {
+          console.log('error')
+          checkingRegister.value = false
           return
         }
       }

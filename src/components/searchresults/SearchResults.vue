@@ -2,7 +2,7 @@
 <template>
   <div v-if="isLoadingPlaces" class="alert alert-primary text-center">
     <h5>Cargando</h5>
-    <span>Esper por favor...</span>
+    <span>Espere por favor...</span>
   </div>
 
   <ul v-else-if="places.length > 0" class="list-group mt-3" style="height: 600px; overflow: auto">

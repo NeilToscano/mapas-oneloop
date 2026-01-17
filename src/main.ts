@@ -1,6 +1,9 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import "bootstrap";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './assets/docs.css';
 import App from './App.vue'
 import router from './router'
 import mapboxgl from 'mapbox-gl' // or "const mapboxgl = require('mapbox-gl');"

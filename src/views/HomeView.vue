@@ -28,4 +28,3 @@ export default defineComponent({
   }
 })
 </script>
-@/components/cardabsolute/CardAbsolute.vue

@@ -1,30 +1,32 @@
 <template>
-  <button class="btn btn-primary" @click="onMyLocationClicked" v-if="isBtnReady">
+  <button class="btn text-white" style="background-color: #32969c" @click="onMyLocationClicked" v-if="isBtnReady && passTimeLogo">
     Ir a mi Ubicación
   </button>
 </template>
 
 <script lang="ts">
 import { useMapsStore, usePlacesStore } from '@/composables'
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, onMounted, ref } from 'vue'
 
 export default defineComponent({
   name: 'MyLocationBtn',
 
   setup() {
-    const { isMapReady } = useMapsStore()
-    const { map } = useMapsStore();
-    const { userLocation, isUserlocationReady } = usePlacesStore()
+    const popoverButton = ref(null)
+    const { map, isMapReady } = useMapsStore()
+    const { userLocation, isUserlocationReady, passTimeLogo } = usePlacesStore()
     return {
+      popoverButton,
       isBtnReady: computed(() => isUserlocationReady.value && isMapReady),
       onMyLocationClicked: () => {
-        if(userLocation.value === null) return;
-        if(!map.value) return;
+        if (userLocation.value === null) return
+        if (!map.value) return
         map.value.flyTo({
           center: userLocation.value,
           essential: true
         })
-      }
+      },
+      passTimeLogo
     }
   }
 })
